@@ -1,33 +1,23 @@
+import { useState, useEffect } from "react";
 import { Product } from "../../app/models/products";
-import {
-  Avatar,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-} from "@mui/material";
+import ProductList from "./ProductList";
+import { Route, Routes } from "react-router-dom";
+import ProductDetails from "./ProductDetails";
+import agent from "../../app/api/agent";
 
-interface Props {
-  products: Product[];
-  addProduct: () => void;
-}
+export default function Catalog() {
+  const [products, setProducts] = useState<Product[]>([]);
 
-export default function Catalog({ products, addProduct }: Props) {
+  useEffect(() => {
+    agent.Catalog.list().then((products) => setProducts(products));
+  }, []);
+
   return (
     <>
-      <List>
-        {products.map((product) => (
-          <ListItem key={product.id}>
-            <ListItemAvatar>
-              <Avatar src={product.pictureUrl} />
-            </ListItemAvatar>
-            <ListItemText>
-              {product.name} - {product.price}
-            </ListItemText>
-          </ListItem>
-        ))}
-        <button onClick={addProduct}>Add Product</button>
-      </List>
+      <Routes>
+        <Route index element={<ProductList products={products} />} />
+        <Route path=":id" element={<ProductDetails />} />
+      </Routes>
     </>
   );
 }
